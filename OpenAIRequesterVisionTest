@@ -1,0 +1,63 @@
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+/**
+ * This class is used to make a request to the OpenAI API with images for comparison.
+ */
+public class OpenAIRequesterVisionTest {
+
+    // The API key should be stored in an environment variable or a config file for security reasons
+    private static final String API_KEY = System.getenv("OPENAI_API_KEY");
+
+    // URLs of the images to be compared
+    private static final String IMAGE_URL_1 = "https://image.com/image_1.jpg";
+    private static final String IMAGE_URL_2 = "https://image.com/image_1.jpg";
+
+    // Text content for the OpenAI request
+    private static final String TEXT_CONTENT = "Compare this two images";
+
+    @Test
+    public void testImageComparison() {
+        String jsonPayload = "{\"model\": \"gpt-4-vision-preview\"," +
+                "\"messages\": [{" +
+                "\"role\": \"user\"," +
+                "\"content\": [" +
+                "{\"type\": \"image_url\", \"image_url\": \"" + IMAGE_URL_1 + "\"}," +
+                "{\"type\": \"text\", \"text\": \"" + TEXT_CONTENT + "\"}," +
+                "{\"type\": \"image_url\", \"image_url\": \"" + IMAGE_URL_2 + "\"}" +
+                "]" +
+                "}]," +
+                "\"max_tokens\": 800}";
+
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            HttpPost request = new HttpPost("https://api.openai.com/v1/chat/completions");
+            request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            request.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + API_KEY);
+            request.setEntity(new StringEntity(jsonPayload));
+
+            String responseString = EntityUtils.toString(client.execute(request).getEntity());
+
+            JSONObject jsonResponse = new JSONObject(responseString);
+            JSONObject message = jsonResponse.getJSONArray("choices").getJSONObject(0).getJSONObject("message");
+
+            String content = message.getString("content");
+
+            System.out.println("Input prompt: \n\n" + TEXT_CONTENT + "\n\n\nResponse Content: \n\n" + content);
+
+            assertNotNull(content, "Content mustn't be null");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("An error occurred during the API request: " + e.getMessage());
+        }
+    }
+}
