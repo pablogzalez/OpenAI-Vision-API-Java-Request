@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class OpenAIRequesterVisionTest {
 
     // The API key should be stored in an environment variable or a config file for security reasons
-    private static final String API_KEY = System.getenv("OPENAI_API_KEY");
+    private static final String API_KEY = "OPENAI_API_KEY";
 
     // URLs of the images to be compared
     private static final String IMAGE_URL_1 = "https://image.com/image_1.jpg";
