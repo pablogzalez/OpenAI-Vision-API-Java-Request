@@ -25,7 +25,7 @@
 ### Installation
 
 1. 📥 Clone this repository:
-git clone https://github.com/yourusername/OpenAI-Vision-API-Java-Integration.git
+git clone https://github.com/yourusername/OpenAI-Vision-API-Java-Request.git
 
 2. 📂 Navigate to the cloned directory:
 cd OpenAI-Vision-API-Java-Integration
